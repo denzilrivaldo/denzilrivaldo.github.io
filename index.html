@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Mechanical design and 3D-printing portfolio of Denzil Rivaldo Amalraj.">
+<title>Denzil Rivaldo Amalraj — Mechanical Design Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#eef4fa; --muted:#93a8ba; --bg:#0a1420; --panel:#101f2e;
+  --line:rgba(214,232,248,.14); --line-strong:rgba(214,232,248,.26);
+  --blue:#4fd3ff; --green:#b9fa61; --copper:#ef9a5c;
+  --font-display:'Space Grotesk',sans-serif; --font-body:'Inter',ui-sans-serif,system-ui,sans-serif; --font-mono:'IBM Plex Mono',ui-monospace,monospace;
+  --max:1180px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);line-height:1.6;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+
+.grid{position:fixed;inset:0;z-index:-2;pointer-events:none;background-image:linear-gradient(rgba(118,172,215,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(118,172,215,.07) 1px,transparent 1px);background-size:42px 42px;mask-image:radial-gradient(circle at 50% 0,#000 2%,transparent 70%)}
+.glow{position:fixed;z-index:-1;pointer-events:none;filter:blur(60px);opacity:.15;border-radius:50%;width:38rem;height:38rem}
+.g1{background:var(--blue);left:-20rem;top:-18rem}
+.g2{background:var(--green);right:-22rem;top:35rem}
+
+.progress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--blue),var(--green));width:0%;z-index:60;transition:width .1s linear}
+
+/* live coordinate readout, DRO-style */
+.hud{position:fixed;right:1rem;bottom:1rem;z-index:55;font-family:var(--font-mono);font-size:.72rem;color:var(--muted);background:rgba(10,20,32,.82);border:1px solid var(--line-strong);border-radius:6px;padding:.5rem .7rem;backdrop-filter:blur(6px);pointer-events:none;letter-spacing:.02em}
+.hud b{color:var(--blue);font-weight:500}
+@media(hover:none),(max-width:760px){.hud{display:none}}
+
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* section-level cursor spotlight */
+section{position:relative}
+section::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .35s ease;background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),rgba(79,211,255,.08),rgba(185,250,97,.03) 45%,transparent 65%);z-index:0}
+section.spot::before{opacity:1}
+section>*{position:relative;z-index:1}
+
+/* card-level pointer glow */
+.glow-card{position:relative;isolation:isolate}
+.glow-card::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s ease;background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),rgba(79,211,255,.16),transparent 60%);z-index:5}
+.glow-card:hover::before{opacity:1}
+.glow-card::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s ease;border:1px solid transparent;background:radial-gradient(220px circle at var(--mx,50%) var(--my,50%),rgba(185,250,97,.55),transparent 60%) border-box;-webkit-mask:linear-gradient(#000 0 0) padding-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;z-index:6}
+.glow-card:hover::after{opacity:1}
+
+/* exploded assembly diagram */
+.exploded-wrap{border:1px solid var(--line);background:linear-gradient(160deg,rgba(17,41,60,.7),rgba(7,16,26,.9));padding:2rem;margin-bottom:2.5rem;overflow:hidden}
+.exploded-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.6rem;margin-bottom:1.2rem}
+.exploded-head span{font-family:var(--font-mono);font-size:.75rem;color:var(--copper);letter-spacing:.06em}
+.exploded-head b{font-family:var(--font-mono);font-size:.7rem;color:var(--muted);cursor:pointer;border:1px solid var(--line-strong);border-radius:99px;padding:.35rem .7rem}
+.exploded-head b:hover{color:var(--ink);border-color:var(--blue)}
+.video-stage{border:1px solid var(--line);background:#0d1a26;overflow:hidden}
+.video-stage video{width:100%;display:block}
+.scrub-row{display:flex;align-items:center;gap:.9rem;margin-top:1.1rem}
+.scrub-label{font-family:var(--font-mono);font-size:.66rem;color:var(--muted);letter-spacing:.06em;white-space:nowrap}
+.scrub-row input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:3px;background:var(--line-strong);border-radius:99px;outline:none}
+.scrub-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border-radius:50%;background:var(--blue);cursor:pointer;border:2px solid #06131c}
+.scrub-row input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--blue);cursor:pointer;border:2px solid #06131c}
+/* filament spiral background */
+section>.filament{position:absolute;inset:0;overflow:hidden;pointer-events:none;opacity:.5;z-index:0}
+.filament svg{position:absolute;top:0;left:0;height:100%;width:200%;animation:filament-drift 34s linear infinite}
+@media(prefers-reduced-motion:reduce){.filament svg{animation:none}}
+@keyframes filament-drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+nav,.wrap{max-width:var(--max);margin:auto;padding-left:1.4rem;padding-right:1.4rem}
+nav{position:sticky;top:0;z-index:50;padding-top:1.2rem;padding-bottom:1.2rem;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(var(--bg) 78%,transparent)}
+.brand{font-family:var(--font-display);font-size:.92rem;font-weight:600;letter-spacing:.02em;display:flex;gap:.7rem;align-items:center}
+.mark{width:1.9rem;height:1.9rem;display:grid;place-items:center;background:var(--green);color:#061018;font-family:var(--font-display);font-weight:700;clip-path:polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%)}
+.navlinks{display:flex;gap:1.5rem;color:var(--muted);font-size:.9rem}
+.navlinks a{position:relative;padding:.2rem 0;display:flex;align-items:baseline;gap:.35rem}
+.navlinks a i{font-style:normal;font-family:var(--font-mono);font-size:.66rem;color:var(--copper);opacity:.8}
+.navlinks a::after{content:"";position:absolute;left:0;bottom:-3px;height:1px;width:0;background:var(--blue);transition:width .2s}
+.navlinks a:hover{color:var(--ink)}
+.navlinks a:hover::after,.navlinks a.active::after{width:100%}
+.navlinks a.active{color:var(--blue)}
+.navtoggle{display:none;background:none;border:1px solid var(--line);border-radius:8px;width:2.5rem;height:2.5rem;color:var(--ink);cursor:pointer;place-items:center}
+.navtoggle span,.navtoggle span::before,.navtoggle span::after{content:"";display:block;width:1.05rem;height:1.5px;background:currentColor;position:relative;transition:.2s}
+.navtoggle span::before{position:absolute;top:-.4rem}
+.navtoggle span::after{position:absolute;top:.4rem}
+.navtoggle[aria-expanded="true"] span{background:transparent}
+.navtoggle[aria-expanded="true"] span::before{transform:rotate(45deg);top:0}
+.navtoggle[aria-expanded="true"] span::after{transform:rotate(-45deg);top:0}
+
+section{padding:6rem 0;border-top:1px solid var(--line)}
+.hero{border:0;min-height:80vh;display:grid;align-content:center;padding-top:2.6rem;padding-bottom:5rem}
+.boot{font-family:var(--font-mono);font-size:.82rem;color:var(--green);min-height:4.6em;margin-bottom:1.4rem}
+.boot div{opacity:0;margin:.15rem 0}
+.boot div.show{opacity:1}
+.boot .caret{display:inline-block;width:.5em;height:1em;background:var(--green);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.eyebrow{margin:0 0 1.2rem;color:var(--green);font-size:.85rem;font-weight:600;font-family:var(--font-mono)}
+h1,h2,h3{font-family:var(--font-display);letter-spacing:-.02em;line-height:1.04;font-weight:600}
+h1{font-size:clamp(2.6rem,6.6vw,6.1rem);margin:0;max-width:960px}
+.intro{max-width:640px;color:#c6d3df;font-size:clamp(1rem,1.9vw,1.2rem);margin:1.8rem 0}
+.actions{display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
+.button{display:inline-flex;align-items:center;gap:.4rem;border:1px solid var(--line-strong);border-radius:99px;padding:.78rem 1.1rem;font-size:.92rem;font-weight:600;cursor:pointer;background:none;color:var(--ink);font-family:var(--font-body)}
+.button.primary{background:var(--blue);color:#06131c;border-color:var(--blue)}
+.button:hover{transform:translateY(-2px);transition:.2s}
+.copy-link{border:0;background:none;color:var(--muted);font-size:.85rem;text-decoration:underline;text-underline-offset:3px;cursor:pointer;font-family:var(--font-body);padding:.4rem}
+.copy-link:hover{color:var(--ink)}
+.meta{margin-top:3rem;display:flex;flex-wrap:wrap;gap:.7rem 1.5rem;color:var(--muted);font-size:.85rem;font-family:var(--font-mono)}
+
+.section-top{display:flex;justify-content:space-between;gap:2rem;align-items:flex-end;flex-wrap:wrap;margin-bottom:2.2rem}
+.opnum{font-family:var(--font-mono);color:var(--copper);font-size:.75rem;letter-spacing:.06em;display:block;margin-bottom:.5rem}
+.titleblock{display:flex;border:1px solid var(--line-strong);font-family:var(--font-mono);font-size:.7rem;color:var(--muted)}
+.titleblock div{padding:.4rem .7rem;border-left:1px solid var(--line-strong)}
+.titleblock div:first-child{border-left:0}
+.titleblock span{display:block;letter-spacing:.05em;font-size:.62rem;margin-bottom:.15rem}
+.titleblock b{color:var(--ink);font-weight:500}
+h2{font-size:clamp(1.9rem,3.6vw,3.3rem);margin:0}
+
+.about{display:grid;grid-template-columns:1.35fr .65fr;gap:3rem}
+.about p{margin:0;color:#c5d1dd;font-size:1.1rem;max-width:62ch}
+.facts{padding-left:1.3rem;border-left:1px solid var(--line)}
+.facts div{padding:.5rem 0;color:var(--muted)}
+.facts b{display:block;color:var(--ink);font-size:.92rem;font-family:var(--font-display);font-weight:600}
+
+.filterbar{display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:2rem}
+.filter-btn{border:1px solid var(--line-strong);background:none;color:var(--muted);border-radius:99px;padding:.5rem .9rem;font-size:.82rem;font-family:var(--font-mono);cursor:pointer;transition:.15s}
+.filter-btn:hover{color:var(--ink);border-color:var(--blue)}
+.filter-btn.active{background:var(--blue);color:#06131c;border-color:var(--blue)}
+
+.feature{border:1px solid var(--line);background:linear-gradient(145deg,rgba(17,41,60,.87),rgba(7,16,26,.95));display:grid;grid-template-columns:1.12fr .88fr;overflow:hidden;margin-bottom:1.1rem;transition:opacity .25s}
+.feature.hide{display:none}
+.feature.reverse{grid-template-columns:.88fr 1.12fr}
+.feature.reverse .feature-copy{order:2}
+.feature.reverse .feature-image{order:1}
+.feature-image{min-height:390px;position:relative;overflow:hidden;background:#071019;color:var(--muted);cursor:zoom-in}
+.feature-image img{width:100%;height:100%;object-fit:cover;object-position:top;display:block;transition:transform .45s ease}
+.feature:hover img{transform:scale(1.035)}
+.feature-image::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(7,16,25,.55),transparent 38%);pointer-events:none}
+.sheet-open{position:absolute;left:1rem;bottom:1rem;z-index:2;font-family:var(--font-mono);font-size:.7rem;color:var(--ink);background:rgba(10,20,32,.78);border:1px solid var(--line-strong);border-radius:99px;padding:.4rem .75rem;opacity:0;transition:.2s}
+.feature-image:hover .sheet-open{opacity:1}
+.pager{position:absolute;right:1rem;bottom:1rem;z-index:3;display:flex;gap:.4rem;align-items:center}
+.pager button{width:1.7rem;height:1.7rem;border-radius:50%;border:1px solid var(--line-strong);background:rgba(10,20,32,.78);color:var(--ink);cursor:pointer;display:grid;place-items:center;font-size:.8rem}
+.pager span{font-family:var(--font-mono);font-size:.68rem;color:var(--ink);background:rgba(10,20,32,.78);border:1px solid var(--line-strong);border-radius:99px;padding:.25rem .55rem}
+.feature-copy{padding:2.1rem;display:flex;flex-direction:column;align-items:flex-start}
+.tag{border:1px solid rgba(185,250,97,.45);color:var(--green);font-size:.7rem;font-weight:600;letter-spacing:.03em;padding:.35rem .58rem;border-radius:99px;font-family:var(--font-mono)}
+.feature h3{font-size:clamp(1.7rem,3.2vw,2.9rem);margin:1.6rem 0 1rem}
+.feature p{color:#b9c9d7;margin:0;max-width:530px}
+.tools{color:var(--blue);font-size:.78rem;font-weight:500;margin-top:auto;padding-top:1.5rem;font-family:var(--font-mono)}
+
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.shot{border:1px solid var(--line);background:var(--panel);overflow:hidden}
+.shot-img{cursor:zoom-in;background:#071019;position:relative}
+.shot-img img{width:100%;height:245px;display:block;object-fit:cover;object-position:top;transition:transform .35s}
+.shot:hover .shot-img img{transform:scale(1.04)}
+.shot-img .sheet-open{left:.75rem;bottom:.75rem}
+.shot>div:last-child{padding:1rem}
+.shot h3{font-size:1.08rem;margin:0 0 .45rem}
+.shot p{font-size:.87rem;color:var(--muted);margin:0}
+.callout{margin-top:1rem;padding:1.35rem 1.5rem;background:rgba(185,250,97,.08);border-left:3px solid var(--green);color:#cfdae4}
+
+.banner{border:1px solid var(--line-strong);margin-bottom:2rem;cursor:zoom-in;position:relative;overflow:hidden;background:#0d1a26}
+.banner img{width:100%;display:block;max-height:220px;object-fit:cover;object-position:top}
+.banner .sheet-open{left:1rem;bottom:1rem}
+
+.single-sheet{border:1px solid var(--line);background:var(--panel);overflow:hidden;cursor:zoom-in;position:relative}
+.single-sheet img{width:100%;display:block;max-height:520px;object-fit:cover;object-position:top}
+
+.process{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line)}
+.step{padding:1.5rem;min-height:180px;border-right:1px solid var(--line)}
+.step:last-child{border-right:0}
+.step span{color:var(--copper);font-family:var(--font-mono);font-size:.85rem}
+.step h3{font-size:1.15rem;margin:1.3rem 0 .4rem}
+.step p{color:var(--muted);font-size:.9rem;margin:0}
+
+.skills{display:flex;flex-wrap:wrap;gap:.65rem}
+.skill{border:1px solid var(--line);border-radius:99px;padding:.6rem .8rem;color:#cad8e4;font-size:.86rem;font-family:var(--font-mono)}
+
+.education{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.card{padding:1.5rem;border:1px solid var(--line);background:var(--panel)}
+.card small{color:var(--blue);font-family:var(--font-mono)}
+.card h3{font-size:1.2rem;margin:.65rem 0 .3rem}
+.card p{color:var(--muted);font-size:.92rem;margin:0}
+
+.contact{min-height:56vh;display:grid;align-content:center}
+.contact h2{max-width:900px;font-size:clamp(2.6rem,6.4vw,5.4rem)}
+.contact h2 span{color:var(--green)}
+footer{padding:1.7rem 0;display:flex;justify-content:space-between;gap:1rem;color:var(--muted);font-size:.82rem;border-top:1px solid var(--line);font-family:var(--font-mono)}
+
+/* document viewer modal */
+.viewer{position:fixed;inset:0;background:rgba(4,9,14,.92);display:none;place-items:center;z-index:100;padding:1.4rem}
+.viewer.open{display:grid}
+.viewer-window{width:min(880px,94vw);max-height:90vh;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line-strong);box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.viewer-bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.7rem 1rem;border-bottom:1px solid var(--line-strong);font-family:var(--font-mono);font-size:.72rem;color:var(--muted)}
+.viewer-bar .fname{color:var(--ink);display:flex;align-items:center;gap:.5rem}
+.viewer-bar .fname b{color:var(--blue);font-weight:500}
+.viewer-bar .vcontrols{display:flex;align-items:center;gap:.6rem}
+.viewer-bar button{background:none;border:1px solid var(--line-strong);color:var(--ink);border-radius:6px;width:1.9rem;height:1.9rem;cursor:pointer;display:grid;place-items:center}
+.viewer-bar .vclose{border-radius:6px}
+.viewer-body{overflow-y:auto;background:#0d1a26}
+.viewer-body img{width:100%;display:block}
+.viewer-caption{padding:.7rem 1rem;border-top:1px solid var(--line-strong);color:var(--muted);font-family:var(--font-mono);font-size:.75rem}
+
+.toast{position:fixed;bottom:1.6rem;left:50%;transform:translateX(-50%) translateY(12px);background:var(--panel);border:1px solid var(--line-strong);color:var(--ink);padding:.7rem 1.1rem;border-radius:8px;font-size:.85rem;font-family:var(--font-mono);opacity:0;pointer-events:none;transition:.25s;z-index:90}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:760px){
+  .navlinks{position:absolute;top:100%;left:0;right:0;background:var(--bg);border-bottom:1px solid var(--line);flex-direction:column;gap:0;padding:.5rem 1.4rem 1.2rem;display:none}
+  .navlinks.open{display:flex}
+  .navlinks a{padding:.75rem 0;border-bottom:1px solid var(--line)}
+  .navtoggle{display:grid}
+  .about,.education{grid-template-columns:1fr;gap:1.25rem}
+  .facts{padding:1rem 0 0;border-left:0;border-top:1px solid var(--line)}
+  .feature,.feature.reverse{grid-template-columns:1fr}
+  .feature.reverse .feature-copy{order:1}
+  .feature.reverse .feature-image{order:2}
+  .feature-image{min-height:260px}
+  .gallery{grid-template-columns:1fr}
+  .shot-img img{height:auto;max-height:420px}
+  .process{grid-template-columns:1fr 1fr}
+  .step:nth-child(2){border-right:0}
+  .step:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .titleblock div:nth-child(2),.titleblock div:nth-child(3){display:none}
+  footer{flex-direction:column}
+}
+</style></head>
+<body>
+<div class="grid"></div><div class="glow g1"></div><div class="glow g2"></div>
+<div class="progress" id="progress"></div>
+<div class="hud" id="hud">POS <b>X 000.0</b> <b>Y 000.0</b> mm</div>
+
+<nav>
+  <a href="#top" class="brand"><span class="mark">D</span> DENZIL RIVALDO</a>
+  <div class="navlinks" id="navlinks">
+    <a href="#work"><i>01</i>Work</a><a href="#drawings"><i>02</i>Drawings</a><a href="#prints"><i>03</i>Prints</a><a href="#skills"><i>04</i>Skills</a><a href="#contact"><i>05</i>Contact</a>
+  </div>
+  <button class="navtoggle" id="navtoggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="navlinks"><span></span></button>
+</nav>
+
+<main class="wrap" id="top">
+
+<section class="hero">
+  <div class="boot" id="boot" aria-hidden="true"></div>
+  <p class="eyebrow reveal">Mechanical Design Engineer</p>
+  <h1 class="reveal">Designing the path from idea to working hardware.</h1>
+  <p class="intro reveal">I am Denzil Rivaldo Amalraj, a mechanical design engineer specializing in CAD, fixture tooling, design-for-manufacturing, iterative prototyping, and 3D printing.</p>
+  <div class="actions reveal">
+    <a class="button primary" href="#work">Explore selected work ↓</a>
+    <a class="button" href="mailto:denzilrivaldo@gmail.com">denzilrivaldo@gmail.com</a>
+    <button class="copy-link" type="button" onclick="copyEmail()">Copy email</button>
+  </div>
+  <div class="meta reveal"><span>SolidWorks CSWP</span><span>MS Mechanical Engineering · UM-Dearborn</span><span>GPA 3.78 / 4.00</span></div>
+</section>
+
+<section>
+  <div class="section-top">
+    <div><span class="opnum">OP 01 — PROFILE</span><h2>Engineering with intent.</h2></div>
+    <div class="titleblock"><div><span>SHEET</span><b>01/07</b></div><div><span>SCALE</span><b>N.T.S.</b></div><div><span>REV</span><b>A</b></div></div>
+  </div>
+  <div class="about">
+    <p>My work sits at the intersection of mechanical design and manufacturable reality. I create precise assemblies, fixtures, tooling components, and prototypes—from the first CAD concept through tolerance refinement, fabrication documentation, and physical fit checks. I bring automotive fixture experience together with hands-on additive manufacturing and FEA-driven design decisions.</p>
+    <div class="facts">
+      <div><b>Current focus</b>Mechanical & product design</div>
+      <div><b>Design approach</b>Iterate, test, refine, build</div>
+      <div><b>Industry experience</b>Automotive BIW fixtures & assembly stations</div>
+      <div><b>Open to</b>Relocation, remote & hybrid roles</div>
+    </div>
+  </div>
+</section>
+
+<section id="work">
+  <div class="section-top">
+    <div><span class="opnum">OP 02 — SELECTED WORK</span><h2>Designed to be built.</h2></div>
+    <div class="titleblock"><div><span>SHEET</span><b>02/07</b></div><div><span>SCALE</span><b>N.T.S.</b></div><div><span>REV</span><b>A</b></div></div>
+  </div>
+  <div class="filterbar" id="filterbar">
+    <button class="filter-btn active" data-filter="all">All work</button>
+    <button class="filter-btn" data-filter="hardware">Precision Hardware</button>
+    <button class="filter-btn" data-filter="enclosure">Enclosure Hardware</button>
+    <button class="filter-btn" data-filter="product">Product Design</button>
+    <button class="filter-btn" data-filter="automotive">Automotive Tooling</button>
+  </div>
+
+  <div class="exploded-wrap">
+    <div class="exploded-head">
+      <span>ANYDESK ORGANIZER — EXPLODED ASSEMBLY</span>
+      <b id="explodedToggle" role="button" tabindex="0">Replay</b>
+    </div>
+    <div class="video-stage">
+      <video id="explodedVideo" src="portfolio-assets/anydesk-exploded.mp4" poster="portfolio-assets/anydesk-exploded-poster.jpg" muted playsinline preload="metadata"></video>
+    </div>
+    <div class="scrub-row">
+      <span class="scrub-label">EXPLODED</span>
+      <input type="range" id="explodedScrub" min="0" max="1000" value="0" aria-label="Scrub between exploded and assembled">
+      <span class="scrub-label">ASSEMBLED</span>
+    </div>
+    <p style="margin:.8rem 0 0;color:var(--muted);font-size:.8rem;font-family:var(--font-mono)">Five printable parts — a two-piece support bar, two-piece storage compartment, and Allen-bolt hardware. Drag the slider to explode or assemble it yourself, or let it play as it scrolls into view.</p>
+  </div>
+
+  <article class="feature glow-card" data-cat="hardware">
+    <div class="feature-image" data-sheet="coupling"><img src="portfolio-assets/print-1.jpg" alt="Magnetic shaft coupling case study sheet — concept, iteration and final build" loading="lazy"><span class="sheet-open">View full sheet ↗</span></div>
+    <div class="feature-copy"><span class="tag">PRECISION HARDWARE</span><h3>Magnetic Shaft Coupling</h3><p>A tool-free, hand-tightened magnetic coupling developed to transmit rotary motion across a sealed wall. The final self-centering collet and T-handle design emerged after structural redesign and five tolerance-focused prototype iterations.</p><div class="tools">Fusion 360 · FDM printing · Tolerance testing · PLA/PETG</div></div>
+  </article>
+
+  <article class="feature reverse glow-card" data-cat="enclosure">
+    <div class="feature-copy"><span class="tag">ENCLOSURE HARDWARE</span><h3>Flyback Transformer Holder</h3><p>A PETG cradle designed in context with a shared electronics enclosure. Curved, four-point-mounted arms locate the transformer while preserving clearance for the power supply, fan, and driver board.</p><div class="tools">CAD assemblies · Design for assembly · PETG · Fit checks</div></div>
+    <div class="feature-image" data-sheet="flyback"><img src="portfolio-assets/print-2.jpg" alt="Flyback transformer holder case study sheet — concept, fit check and final build" loading="lazy"><span class="sheet-open">View full sheet ↗</span></div>
+  </article>
+
+  <article class="feature glow-card" data-cat="product">
+    <div class="feature-image" data-sheet="anydesk" data-page="0"><img src="portfolio-assets/print-4.jpg" alt="AnyDesk Organizer case study — page 1 of 3, initial concept and ideation" loading="lazy"><span class="sheet-open">View full sheet ↗</span><div class="pager"><button type="button" data-dir="-1" aria-label="Previous page">‹</button><span data-role="pagecount">1 / 3</span><button type="button" data-dir="1" aria-label="Next page">›</button></div></div>
+    <div class="feature-copy"><span class="tag">PRODUCT DESIGN · ME 595</span><h3>AnyDesk Organizer</h3><p>A universal 3D-printed desk-side organizer engineered to clamp to rectangular, L-shaped, and circular desks. A rotating-clip mechanism, selected over the initial sliding concept, delivers up to 146° of adjustment. The five-part PLA prototype was refined with FEA-guided weight optimization, reducing mass from 3.2 kg to 2 kg. Full three-page case study — cycle through concept, CAD development, and the finished prototype in use.</p><div class="tools">SolidWorks · FEA · DFM · Prusa Mini+ · PLA · Prototype fabrication</div></div>
+  </article>
+
+  <article class="feature reverse glow-card" data-cat="automotive">
+    <div class="feature-copy"><span class="tag">AUTOMOTIVE TOOLING</span><h3>BIW Geo Fixture System</h3><p>Top-level welding/checking fixture layouts coordinate A-frames, clamps, locators, rest units, shot pins, dump units, and purchased components into traceable multi-unit stations. This work reflects hands-on experience designing BIW welding fixtures and assembly stations for automotive OEM programs.</p><div class="tools">SolidWorks · Teamcenter PLM · NAAMS · BOM management · Detail drawings</div></div>
+    <div class="feature-image" data-sheet="geolayout"><img src="portfolio-assets/fixture-aframe.jpg" alt="Geo fixture full system layout drawing with unit call-outs" loading="lazy"><span class="sheet-open">View full sheet ↗</span></div>
+  </article>
+</section>
+
+<section id="drawings">
+  <div class="section-top">
+    <div><span class="opnum">OP 03 — DRAWINGS &amp; DETAIL</span><h2>Precision in the details.</h2></div>
+    <div class="titleblock"><div><span>SHEET</span><b>03/07</b></div><div><span>SCALE</span><b>N.T.S.</b></div><div><span>REV</span><b>A</b></div></div>
+  </div>
+  <p class="intro" style="margin-top:0">A multi-station BIW geo fixture package — from the full system layout down to individual machined and welded detail units, each traceable back to its own unit drawing.</p>
+  <div class="banner glow-card" data-sheet="cover"><img src="portfolio-assets/fixture-layout.jpg" alt="Mechanical Design Portfolio cover — fixture, tooling and weldment component design" loading="lazy"><span class="sheet-open">View full sheet ↗</span></div>
+  <div class="gallery">
+    <article class="shot glow-card"><div class="shot-img" data-sheet="aframe"><img src="portfolio-assets/fixture-clamp.jpg" alt="A-Frame Unit structural frame assembly drawing" loading="lazy"><span class="sheet-open">View full sheet ↗</span></div><div><h3>A-Frame Unit</h3><p>Welded structural frame integrating a rotary turntable, weld washers, and stop blocks — the backbone of the station.</p></div></article>
+    <article class="shot glow-card"><div class="shot-img" data-sheet="clampunit"><img src="portfolio-assets/fixture-angle-bracket.jpg" alt="Clamp Unit powered clamping sub-assembly drawing" loading="lazy"><span class="sheet-open">View full sheet ↗</span></div><div><h3>Clamp Unit</h3><p>Power clamp, clamp arm, and proximity sensor combined into one sensing-integrated sub-assembly.</p></div></article>
+    <article class="shot glow-card"><div class="shot-img" data-sheet="backup"><img src="portfolio-assets/fixture-blade.jpg" alt="Back-Up locating block detail drawing" loading="lazy"><span class="sheet-open">View full sheet ↗</span></div><div><h3>Back-Up Block</h3><p>Purchased NAAMS block, machine-altered with a flame-hardened locating surface for wear resistance.</p></div></article>
+    <article class="shot glow-card"><div class="shot-img" data-sheet="wedge"><img src="portfolio-assets/fixture-controls-bracket.jpg" alt="Wedge Block angled locating block detail drawing" loading="lazy"><span class="sheet-open">View full sheet ↗</span></div><div><h3>Wedge Block</h3><p>Compound-angle locating block machined from hot-rolled steel, dimensioned with auxiliary views.</p></div></article>
+    <article class="shot glow-card"><div class="shot-img" data-sheet="finger"><img src="portfolio-assets/fixture-guard-support.jpg" alt="Finger machined locating finger detail drawing" loading="lazy"><span class="sheet-open">View full sheet ↗</span></div><div><h3>Locating Finger</h3><p>Slender machined arm with a stepped, pocketed profile for reaching into tight fixture geometry.</p></div></article>
+  </div>
+</section>
+
+<section id="prints">
+  <div class="section-top">
+    <div><span class="opnum">OP 04 — MAKER WORK</span><h2>3D prints made to share.</h2></div>
+    <div class="titleblock"><div><span>SHEET</span><b>04/07</b></div><div><span>SCALE</span><b>N.T.S.</b></div><div><span>REV</span><b>A</b></div></div>
+  </div>
+  <div class="filament" aria-hidden="true">
+    <svg viewBox="0 0 1600 400" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path id="fw1" d="M0,150 C50,90 150,90 200,150 C250,210 350,210 400,150 C450,90 550,90 600,150 C650,210 750,210 800,150" fill="none" stroke="#4fd3ff" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/>
+      <path id="fw2" d="M0,220 C50,160 150,160 200,220 C250,280 350,280 400,220 C450,160 550,160 600,220 C650,280 750,280 800,220" fill="none" stroke="#b9fa61" stroke-width="2.5" stroke-linecap="round" opacity="0.3"/>
+      <path id="fw3" d="M0,290 C50,230 150,230 200,290 C250,350 350,350 400,290 C450,230 550,230 600,290 C650,350 750,350 800,290" fill="none" stroke="#ef9a5c" stroke-width="2" stroke-linecap="round" opacity="0.25"/>
+      <use href="#fw1" x="800"/><use href="#fw2" x="800"/><use href="#fw3" x="800"/>
+    </svg>
+  </div>
+  <p class="intro" style="margin-top:0">Beyond engineering projects, I design and 3D-print functional gifts and custom parts for friends and family. Each piece is an opportunity to explore form, fit, usability, and the satisfaction of turning a personal idea into a real object.</p>
+  <div class="single-sheet glow-card" data-sheet="gifts"><img src="portfolio-assets/print-3.jpg" alt="3D printed gift models designed for friends and family" loading="lazy"><span class="sheet-open">View full sheet ↗</span></div>
+  <div class="callout">Want a custom 3D-printed item or mechanical prototype? I enjoy designing practical, one-of-a-kind objects that solve a real need or make a thoughtful gift.</div>
+</section>
+
+<section>
+  <div class="section-top">
+    <div><span class="opnum">OP 05 — METHOD</span><h2>Concept → CAD → prototype.</h2></div>
+    <div class="titleblock"><div><span>SHEET</span><b>05/07</b></div><div><span>SCALE</span><b>N.T.S.</b></div><div><span>REV</span><b>A</b></div></div>
+  </div>
+  <div class="process">
+    <div class="step"><span>01</span><h3>Frame the problem</h3><p>Define user, manufacturing, fit, clearance, and performance constraints before geometry is finalized.</p></div>
+    <div class="step"><span>02</span><h3>Build precise CAD</h3><p>Develop robust parts and assemblies with design standards, datums, tolerance stack-up, and manufacturability in mind.</p></div>
+    <div class="step"><span>03</span><h3>Validate and iterate</h3><p>Use assembly checks, FEA, fit testing, and design reviews to find failure points early and improve the design.</p></div>
+    <div class="step"><span>04</span><h3>Release to build</h3><p>Translate the design into detailed manufacturing prints, BOMs, and prototypes that can be confidently fabricated.</p></div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="section-top">
+    <div><span class="opnum">OP 06 — TOOLKIT</span><h2>Technical capabilities.</h2></div>
+    <div class="titleblock"><div><span>SHEET</span><b>06/07</b></div><div><span>SCALE</span><b>N.T.S.</b></div><div><span>REV</span><b>A</b></div></div>
+  </div>
+  <div class="skills">
+    <span class="skill glow-card">SolidWorks (CSWP)</span><span class="skill glow-card">Autodesk Inventor</span><span class="skill glow-card">Fusion 360</span><span class="skill glow-card">NX / Designcenter</span><span class="skill glow-card">CATIA V5</span><span class="skill glow-card">Creo</span><span class="skill glow-card">AutoCAD</span><span class="skill glow-card">Teamcenter PLM</span><span class="skill glow-card">ANSYS Mechanical / FEA</span><span class="skill glow-card">GD&T / ASME Y14.5</span><span class="skill glow-card">NAAMS</span><span class="skill glow-card">Tolerance Stack-Up</span><span class="skill glow-card">DFM & DFA</span><span class="skill glow-card">FMEA</span><span class="skill glow-card">Reverse Engineering</span><span class="skill glow-card">FFF/FDM 3D Printing</span><span class="skill glow-card">Prusa Slicer</span><span class="skill glow-card">Bambu Studio</span><span class="skill glow-card">Lean Manufacturing</span><span class="skill glow-card">Six Sigma</span>
+  </div>
+</section>
+
+<section>
+  <div class="section-top">
+    <div><span class="opnum">OP 07 — EDUCATION</span><h2>Foundation.</h2></div>
+    <div class="titleblock"><div><span>SHEET</span><b>07/07</b></div><div><span>SCALE</span><b>N.T.S.</b></div><div><span>REV</span><b>A</b></div></div>
+  </div>
+  <div class="education">
+    <article class="card glow-card"><small>SEP 2024 — APR 2026</small><h3>University of Michigan–Dearborn</h3><p>Master of Science in Mechanical Engineering<br>GPA: 3.78 / 4.00</p></article>
+    <article class="card glow-card"><small>JUN 2017 — APR 2021</small><h3>Sri Eshwar College of Engineering</h3><p>Bachelor of Engineering in Mechanical Engineering<br>GPA: 3.14 / 4.00</p></article>
+  </div>
+</section>
+
+<section id="contact" class="contact">
+  <p class="eyebrow">Let's build something useful.</p>
+  <h2>Have a mechanical design challenge? <span>Let's talk.</span></h2>
+  <div class="actions">
+    <a class="button primary" href="mailto:denzilrivaldo@gmail.com">Email Denzil ↗</a>
+    <a class="button" href="https://linkedin.com/in/denzil-rivaldo" target="_blank" rel="noopener">LinkedIn ↗</a>
+    <button class="copy-link" type="button" onclick="copyEmail()">Copy email</button>
+  </div>
+</section>
+
+<footer><span>© 2026 Denzil Rivaldo Amalraj</span><span>Mechanical Design Engineer</span></footer>
+</main>
+
+<div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="viewer-window">
+    <div class="viewer-bar">
+      <div class="fname">DRAWING_VIEWER <b id="viewerFile">—</b></div>
+      <div class="vcontrols">
+        <button type="button" id="viewerPrev" aria-label="Previous page">‹</button>
+        <span id="viewerCount" style="font-family:var(--font-mono)">1 / 1</span>
+        <button type="button" id="viewerNext" aria-label="Next page">›</button>
+        <button type="button" class="vclose" id="viewerClose" aria-label="Close viewer">✕</button>
+      </div>
+    </div>
+    <div class="viewer-body" id="viewerBody"><img id="viewerImg" src="" alt=""></div>
+    <div class="viewer-caption" id="viewerCaption"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // sheet registry — image pages + captions for the document viewer
+  var sheets = {
+    coupling:  { file:'magnetic-shaft-coupling', pages:['portfolio-assets/print-1.jpg'], captions:['Concept, iteration and final build — self-centering collet with tool-free T-handle.'] },
+    flyback:   { file:'flyback-transformer-holder', pages:['portfolio-assets/print-2.jpg'], captions:['Concept, fit check and final build — curved cradle arms wired against the enclosure model.'] },
+    anydesk:   { file:'anydesk-organizer', pages:['portfolio-assets/print-4.jpg','portfolio-assets/print-5.jpg','portfolio-assets/print-6.jpg'],
+                 captions:['Page 1/3 — initial concept & ideation.','Page 2/3 — CAD development & prototyping.','Page 3/3 — final 3D-printed prototype, tested in use.'] },
+    geolayout: { file:'biw-geo-fixture-system', pages:['portfolio-assets/fixture-aframe.jpg'], captions:['Full system layout — clamp, locator, and shot-pin units arrayed around the A-frame.'] },
+    cover:     { file:'mechanical-design-portfolio', pages:['portfolio-assets/fixture-layout.jpg'], captions:['Fixture, tooling & weldment component design — selected detail drawings.'] },
+    aframe:    { file:'a-frame-unit', pages:['portfolio-assets/fixture-clamp.jpg'], captions:['Structural frame assembly — the welded backbone of the fixture.'] },
+    clampunit: { file:'clamp-unit', pages:['portfolio-assets/fixture-angle-bracket.jpg'], captions:['Powered clamping sub-assembly with proximity sensing.'] },
+    backup:    { file:'back-up-block', pages:['portfolio-assets/fixture-blade.jpg'], captions:['Purchased & altered locating block, flame-hardened on the locating face.'] },
+    wedge:     { file:'wedge-block', pages:['portfolio-assets/fixture-controls-bracket.jpg'], captions:['Angled locating block, machined from hot-rolled steel.'] },
+    finger:    { file:'locating-finger', pages:['portfolio-assets/fixture-guard-support.jpg'], captions:['Machined locating finger for tight fixture geometry.'] },
+    gifts:     { file:'3d-print-gifts', pages:['portfolio-assets/print-3.jpg'], captions:['Custom-designed models made as gifts for friends and family.'] }
+  };
+
+  /* ---- boot sequence ---- */
+  var bootLines = [
+    'INITIALIZING WORKSPACE...',
+    'LOADING ASSEMBLY: DENZIL_RIVALDO.SLDASM ... OK',
+    'TOLERANCE STACKUP: PASS — READY'
+  ];
+  var bootEl = document.getElementById('boot');
+  var revealEls = document.querySelectorAll('.reveal');
+
+  function showReveals(){
+    revealEls.forEach(function(el, i){
+      setTimeout(function(){ el.classList.add('in'); }, reduced ? 0 : i * 120);
+    });
+  }
+
+  if(reduced){
+    bootEl.style.display = 'none';
+    showReveals();
+  } else {
+    var lineIdx = 0, charIdx = 0;
+    var lineEl = null;
+    function typeNext(){
+      if(lineIdx >= bootLines.length){
+        setTimeout(function(){
+          bootEl.style.transition = 'opacity .4s ease';
+          bootEl.style.opacity = '0';
+          setTimeout(function(){ bootEl.style.display = 'none'; }, 420);
+          showReveals();
+        }, 260);
+        return;
+      }
+      if(charIdx === 0){
+        lineEl = document.createElement('div');
+        lineEl.classList.add('show');
+        bootEl.appendChild(lineEl);
+      }
+      var text = bootLines[lineIdx];
+      lineEl.textContent = text.slice(0, charIdx + 1);
+      charIdx++;
+      if(charIdx <= text.length){
+        setTimeout(typeNext, 14 + Math.random() * 18);
+      } else {
+        lineIdx++; charIdx = 0;
+        setTimeout(typeNext, 220);
+      }
+    }
+    typeNext();
+  }
+
+  /* ---- live coordinate HUD ---- */
+  var hud = document.getElementById('hud');
+  if(hud && window.matchMedia && window.matchMedia('(hover:hover)').matches){
+    document.addEventListener('mousemove', function(e){
+      var x = (e.clientX / 3).toFixed(1);
+      var y = (e.clientY / 3).toFixed(1);
+      hud.innerHTML = 'POS <b>X ' + ('000' + x).slice(-6) + '</b> <b>Y ' + ('000' + y).slice(-6) + '</b> mm';
+    }, { passive: true });
+  }
+
+  /* ---- mobile nav ---- */
+  var toggle = document.getElementById('navtoggle');
+  var navlinks = document.getElementById('navlinks');
+  toggle.addEventListener('click', function(){
+    var open = navlinks.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  navlinks.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){ navlinks.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); });
+  });
+
+  /* ---- scroll progress ---- */
+  var progress = document.getElementById('progress');
+  function onScroll(){
+    var h = document.documentElement;
+    var scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+    progress.style.width = scrolled + '%';
+  }
+  document.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  /* ---- scrollspy ---- */
+  var navAnchors = Array.prototype.slice.call(navlinks.querySelectorAll('a'));
+  var navSections = navAnchors.map(function(a){ return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
+  if('IntersectionObserver' in window && navSections.length){
+    var spy = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        var id = '#' + entry.target.id;
+        var link = navAnchors.find(function(a){ return a.getAttribute('href') === id; });
+        if(!link) return;
+        if(entry.isIntersecting){
+          navAnchors.forEach(function(a){ a.classList.remove('active'); });
+          link.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-40% 0px -50% 0px', threshold: 0 });
+    navSections.forEach(function(s){ spy.observe(s); });
+  }
+
+  /* ---- work filter ---- */
+  var filterbar = document.getElementById('filterbar');
+  var features = Array.prototype.slice.call(document.querySelectorAll('#work .feature'));
+  filterbar.addEventListener('click', function(e){
+    var btn = e.target.closest('.filter-btn');
+    if(!btn) return;
+    filterbar.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    var f = btn.getAttribute('data-filter');
+    features.forEach(function(feat){
+      feat.classList.toggle('hide', f !== 'all' && feat.getAttribute('data-cat') !== f);
+    });
+  });
+
+  /* ---- inline pager (AnyDesk card) ---- */
+  document.querySelectorAll('[data-sheet][data-page]').forEach(function(wrap){
+    var id = wrap.getAttribute('data-sheet');
+    var sheet = sheets[id];
+    if(!sheet) return;
+    var img = wrap.querySelector('img');
+    var countEl = wrap.querySelector('[data-role="pagecount"]');
+    wrap.querySelectorAll('.pager button').forEach(function(btn){
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        var page = parseInt(wrap.getAttribute('data-page'), 10);
+        var dir = parseInt(btn.getAttribute('data-dir'), 10);
+        page = (page + dir + sheet.pages.length) % sheet.pages.length;
+        wrap.setAttribute('data-page', page);
+        img.src = sheet.pages[page];
+        img.alt = sheet.captions[page] || img.alt;
+        if(countEl) countEl.textContent = (page + 1) + ' / ' + sheet.pages.length;
+      });
+    });
+  });
+
+  /* ---- document viewer modal ---- */
+  var viewer = document.getElementById('viewer');
+  var viewerImg = document.getElementById('viewerImg');
+  var viewerFile = document.getElementById('viewerFile');
+  var viewerCount = document.getElementById('viewerCount');
+  var viewerCaption = document.getElementById('viewerCaption');
+  var viewerPrev = document.getElementById('viewerPrev');
+  var viewerNext = document.getElementById('viewerNext');
+  var viewerClose = document.getElementById('viewerClose');
+  var viewerBody = document.getElementById('viewerBody');
+  var current = null, currentPage = 0, lastFocused = null;
+
+  function renderViewer(){
+    var sheet = sheets[current];
+    if(!sheet) return;
+    viewerImg.src = sheet.pages[currentPage];
+    viewerImg.alt = sheet.captions[currentPage] || '';
+    viewerFile.textContent = sheet.file + (sheet.pages.length > 1 ? '.sheet' : '.dwg');
+    viewerCount.textContent = (currentPage + 1) + ' / ' + sheet.pages.length;
+    viewerCaption.textContent = sheet.captions[currentPage] || '';
+    var multi = sheet.pages.length > 1;
+    viewerPrev.style.visibility = multi ? 'visible' : 'hidden';
+    viewerNext.style.visibility = multi ? 'visible' : 'hidden';
+    viewerBody.scrollTop = 0;
+  }
+  function openViewer(id, page){
+    if(!sheets[id]) return;
+    current = id; currentPage = page || 0;
+    renderViewer();
+    viewer.classList.add('open');
+    viewer.setAttribute('aria-hidden', 'false');
+    lastFocused = document.activeElement;
+    viewerClose.focus();
+    document.body.style.overflow = 'hidden';
+  }
+  function closeViewer(){
+    viewer.classList.remove('open');
+    viewer.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    if(lastFocused) lastFocused.focus();
+  }
+  viewerPrev.addEventListener('click', function(){
+    var sheet = sheets[current];
+    currentPage = (currentPage - 1 + sheet.pages.length) % sheet.pages.length;
+    renderViewer();
+  });
+  viewerNext.addEventListener('click', function(){
+    var sheet = sheets[current];
+    currentPage = (currentPage + 1) % sheet.pages.length;
+    renderViewer();
+  });
+  viewerClose.addEventListener('click', closeViewer);
+  viewer.addEventListener('click', function(e){ if(e.target === viewer) closeViewer(); });
+  document.addEventListener('keydown', function(e){
+    if(!viewer.classList.contains('open')) return;
+    if(e.key === 'Escape') closeViewer();
+    if(e.key === 'ArrowRight') viewerNext.click();
+    if(e.key === 'ArrowLeft') viewerPrev.click();
+  });
+  document.querySelectorAll('[data-sheet]').forEach(function(wrap){
+    wrap.addEventListener('click', function(){
+      var id = wrap.getAttribute('data-sheet');
+      var page = parseInt(wrap.getAttribute('data-page'), 10) || 0;
+      openViewer(id, page);
+    });
+  });
+
+  /* ---- copy email ---- */
+  var toast = document.getElementById('toast');
+  var toastTimer;
+  window.copyEmail = function(){
+    var email = 'denzilrivaldo@gmail.com';
+    var show = function(msg){
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 2200);
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(email).then(function(){ show('Email copied to clipboard'); }).catch(function(){ show(email); });
+    } else { show(email); }
+  };
+
+  /* ---- section spotlight + card pointer-glow (skip on touch) ---- */
+  if(window.matchMedia && window.matchMedia('(hover:hover)').matches){
+    document.addEventListener('pointermove', function(e){
+      var sec = e.target.closest('section');
+      if(sec){
+        var r = sec.getBoundingClientRect();
+        sec.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+        sec.style.setProperty('--my', (e.clientY - r.top) + 'px');
+        sec.classList.add('spot');
+      }
+      var card = e.target.closest('.glow-card');
+      document.querySelectorAll('.glow-card').forEach(function(c){
+        if(c !== card) return;
+        var cr = c.getBoundingClientRect();
+        c.style.setProperty('--mx', (e.clientX - cr.left) + 'px');
+        c.style.setProperty('--my', (e.clientY - cr.top) + 'px');
+      });
+    }, { passive: true });
+    document.querySelectorAll('section').forEach(function(sec){
+      sec.addEventListener('pointerleave', function(){ sec.classList.remove('spot'); });
+    });
+  }
+
+  /* ---- AnyDesk exploded-assembly video scrubber ---- */
+  var explodedVideo = document.getElementById('explodedVideo');
+  var explodedScrub = document.getElementById('explodedScrub');
+  var explodedToggle = document.getElementById('explodedToggle');
+  if(explodedVideo && explodedScrub){
+    var duration = 0;
+    var scrubbing = false;
+    explodedVideo.addEventListener('loadedmetadata', function(){ duration = explodedVideo.duration || 0; });
+    explodedVideo.addEventListener('timeupdate', function(){
+      if(scrubbing || !duration) return;
+      explodedScrub.value = Math.round((explodedVideo.currentTime / duration) * 1000);
+    });
+    explodedVideo.addEventListener('ended', function(){ explodedScrub.value = 1000; });
+    explodedScrub.addEventListener('input', function(){
+      if(!duration) return;
+      scrubbing = true;
+      explodedVideo.pause();
+      explodedVideo.currentTime = (explodedScrub.value / 1000) * duration;
+    });
+    explodedScrub.addEventListener('change', function(){ scrubbing = false; });
+
+    var playOnce = function(){
+      explodedVideo.currentTime = 0;
+      explodedScrub.value = 0;
+      var p = explodedVideo.play();
+      if(p && p.catch) p.catch(function(){});
+    };
+    if('IntersectionObserver' in window){
+      var vio = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if(entry.isIntersecting){
+            if(reduced){ explodedVideo.currentTime = duration || 0; explodedScrub.value = 1000; }
+            else playOnce();
+            vio.unobserve(explodedVideo);
+          }
+        });
+      }, { threshold: 0.4 });
+      vio.observe(explodedVideo);
+    }
+    explodedToggle.addEventListener('click', playOnce);
+    explodedToggle.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); playOnce(); } });
+  }
+})();
+</script>
+</body></html>
